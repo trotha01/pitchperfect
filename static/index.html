@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Pitch Perfect</title>
+		<script src="elm.js"></script>
+		<script src="audiosynth.js"></script>
+	</head>
+	<body>
+		<div id="elm"></div>
+		<script>
+		var app = Elm.Main.init({
+			node: document.getElementById('elm')
+		});
+app.ports.playSound.subscribe(function(data) {
+	Synth.play(data.instrument, data.note, data.octave, data.duration);
+})
+		</script>
+	</body>
+</html>
