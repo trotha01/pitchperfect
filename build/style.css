@@ -1,0 +1,84 @@
+*, *::before, *::after
+{
+  margin: 0; padding: 0; box-sizing:border-box
+}
+
+html, body {
+  height: 100%;
+}
+
+/* GENERIC  CLASSES */
+
+.column {
+  display:  flex;
+  flex-direction: column;
+}
+
+.row {
+  display:  flex;
+  flex-direction: row;
+}
+
+.center {
+  justify-content: center;
+  text-align: center;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.grow-2 {
+  flex-grow 2;
+}
+
+.button {
+  cursor: pointer;
+}
+
+/* GAME SPECIFIC CLASSES */
+.game {
+  height: 100%;
+}
+
+.header {
+  margin: 1rem;
+}
+
+.controls {
+  justify-content: flex-end;
+}
+
+.status {
+  justify-content: flex-end;
+}
+
+.choices {
+  flex-grow: 1;
+  flex-wrap: wrap;
+}
+
+.choice {
+  flex-grow: 1;
+  /*flex-basis: 50%;*/
+}
+
+.start-button {
+  height: 100%; 
+}
+
+.replay-button {
+  height: 2rem;
+  width: 7rem;
+  background-color: lightblue;
+  border: 1px solid blue;
+}
+
+.button .answer {
+  flex: grow;
+
+}
+
+.correct {
+  background-color: green;
+}
