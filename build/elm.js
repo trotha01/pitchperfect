@@ -853,6 +853,43 @@ var _Basics_xor = F2(function(a, b) { return a !== b; });
 
 
 
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
+
+
+
 function _Char_toCode(char)
 {
 	var code = char.charCodeAt(0);
@@ -3872,43 +3909,6 @@ function _VirtualDom_dekey(keyedNode)
 
 
 
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
-
-
-
 
 // HELPERS
 
@@ -4878,6 +4878,9 @@ var author$project$Main$UrlChanged = function (a) {
 };
 var elm$core$Basics$False = {$: 'False'};
 var elm$core$Basics$True = {$: 'True'};
+var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
+var elm$core$Maybe$Nothing = {$: 'Nothing'};
 var elm$core$Basics$EQ = {$: 'EQ'};
 var elm$core$Basics$LT = {$: 'LT'};
 var elm$core$Elm$JsArray$foldr = _JsArray_foldr;
@@ -4958,18 +4961,42 @@ var elm$core$Set$toList = function (_n0) {
 	var dict = _n0.a;
 	return elm$core$Dict$keys(dict);
 };
+var elm$core$Basics$add = _Basics_add;
+var elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var elm$core$Basics$mul = _Basics_mul;
+var elm$random$Random$next = function (_n0) {
+	var state0 = _n0.a;
+	var incr = _n0.b;
+	return A2(elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var elm$random$Random$initialSeed = function (x) {
+	var _n0 = elm$random$Random$next(
+		A2(elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _n0.a;
+	var incr = _n0.b;
+	var state2 = (state1 + x) >>> 0;
+	return elm$random$Random$next(
+		A2(elm$random$Random$Seed, state2, incr));
+};
 var author$project$Main$initialModel = F2(
 	function (key, url) {
 		return {
-			correctAnswer: false,
+			answer: elm$core$Maybe$Nothing,
 			currentKey: '',
+			currentKnowledge: elm$core$Dict$empty,
 			homescreen: true,
 			key: key,
 			keysTesting: _List_Nil,
 			keysToTest: _List_fromArray(
 				['C', 'D', 'E', 'F', 'G', 'A', 'B']),
 			points: 0,
-			url: url
+			seed: elm$random$Random$initialSeed(0),
+			url: url,
+			winner: false
 		};
 	});
 var elm$core$Result$isOk = function (result) {
@@ -5071,7 +5098,6 @@ var elm$core$Array$treeFromBuilder = F2(
 			}
 		}
 	});
-var elm$core$Basics$add = _Basics_add;
 var elm$core$Basics$apL = F2(
 	function (f, x) {
 		return f(x);
@@ -5082,7 +5108,6 @@ var elm$core$Basics$max = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) > 0) ? x : y;
 	});
-var elm$core$Basics$mul = _Basics_mul;
 var elm$core$Basics$sub = _Basics_sub;
 var elm$core$Elm$JsArray$length = _JsArray_length;
 var elm$core$Array$builderToArray = F2(
@@ -5153,7 +5178,6 @@ var elm$core$Array$initialize = F2(
 var elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
 };
-var elm$core$Maybe$Nothing = {$: 'Nothing'};
 var elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -5379,9 +5403,7 @@ var author$project$Main$subscriptions = function (_n0) {
 	return elm$core$Platform$Sub$none;
 };
 var author$project$Main$NextLevel = {$: 'NextLevel'};
-var author$project$Main$PlaySound = function (a) {
-	return {$: 'PlaySound', a: a};
-};
+var author$project$Main$NextSound = {$: 'NextSound'};
 var elm$core$Basics$always = F2(
 	function (a, _n0) {
 		return a;
@@ -5545,6 +5567,131 @@ var author$project$Main$after = F2(
 			elm$core$Basics$always(msg),
 			elm$core$Process$sleep(time));
 	});
+var author$project$Main$decreaseKnowledge = function (knowledge) {
+	if (knowledge.$ === 'Nothing') {
+		return elm$core$Maybe$Just(0);
+	} else {
+		var v = knowledge.a;
+		return elm$core$Maybe$Just(v - 1);
+	}
+};
+var author$project$Main$increaseKnowledge = function (knowledge) {
+	if (knowledge.$ === 'Nothing') {
+		return elm$core$Maybe$Just(1);
+	} else {
+		var v = knowledge.a;
+		return elm$core$Maybe$Just(v + 1);
+	}
+};
+var elm$core$Dict$Black = {$: 'Black'};
+var elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var elm$core$Basics$compare = _Utils_compare;
+var elm$core$Dict$Red = {$: 'Red'};
+var elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _n1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _n3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					elm$core$Dict$RBNode_elm_builtin,
+					elm$core$Dict$Red,
+					key,
+					value,
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _n5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _n6 = left.d;
+				var _n7 = _n6.a;
+				var llK = _n6.b;
+				var llV = _n6.c;
+				var llLeft = _n6.d;
+				var llRight = _n6.e;
+				var lRight = left.e;
+				return A5(
+					elm$core$Dict$RBNode_elm_builtin,
+					elm$core$Dict$Red,
+					lK,
+					lV,
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5(elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Red, key, value, elm$core$Dict$RBEmpty_elm_builtin, elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _n1 = A2(elm$core$Basics$compare, key, nKey);
+			switch (_n1.$) {
+				case 'LT':
+					return A5(
+						elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3(elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5(elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3(elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _n0 = A3(elm$core$Dict$insertHelp, key, value, dict);
+		if ((_n0.$ === 'RBNode_elm_builtin') && (_n0.a.$ === 'Red')) {
+			var _n1 = _n0.a;
+			var k = _n0.b;
+			var v = _n0.c;
+			var l = _n0.d;
+			var r = _n0.e;
+			return A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _n0;
+			return x;
+		}
+	});
 var elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -5578,28 +5725,189 @@ var author$project$Main$nextKey = function (model) {
 		if (_n1.$ === 'Just') {
 			var key = _n1.a;
 			return _Utils_Tuple2(
-				key,
+				elm$core$Maybe$Just(key),
 				A2(
 					elm$core$Maybe$withDefault,
 					model.keysToTest,
 					elm$core$List$tail(model.keysToTest)));
 		} else {
-			return _Utils_Tuple2('C', model.keysToTest);
+			return _Utils_Tuple2(elm$core$Maybe$Nothing, model.keysToTest);
 		}
 	}();
-	var newKey = _n0.a;
+	var nextNote = _n0.a;
 	var keysRemaining = _n0.b;
-	return _Utils_update(
-		model,
-		{
-			currentKey: newKey,
-			homescreen: false,
-			keysTesting: A2(elm$core$List$cons, newKey, model.keysTesting),
-			keysToTest: keysRemaining
-		});
+	if (nextNote.$ === 'Nothing') {
+		return _Utils_update(
+			model,
+			{winner: true});
+	} else {
+		var newKey = nextNote.a;
+		return _Utils_update(
+			model,
+			{
+				currentKey: newKey,
+				currentKnowledge: A3(elm$core$Dict$insert, newKey, 0, model.currentKnowledge),
+				homescreen: false,
+				keysTesting: A2(elm$core$List$cons, newKey, model.keysTesting),
+				keysToTest: keysRemaining
+			});
+	}
 };
 var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Main$playSound = _Platform_outgoingPort('playSound', elm$json$Json$Encode$string);
+var author$project$Main$weighKnowledge = function (knowledge) {
+	return (!knowledge) ? 2 : (1 / knowledge);
+};
+var elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
+var elm$core$List$sum = function (numbers) {
+	return A3(elm$core$List$foldl, elm$core$Basics$add, 0, numbers);
+};
+var elm$core$Bitwise$and = _Bitwise_and;
+var elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var elm$core$Bitwise$xor = _Bitwise_xor;
+var elm$random$Random$peel = function (_n0) {
+	var state = _n0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var elm$random$Random$float = F2(
+	function (a, b) {
+		return elm$random$Random$Generator(
+			function (seed0) {
+				var seed1 = elm$random$Random$next(seed0);
+				var range = elm$core$Basics$abs(b - a);
+				var n1 = elm$random$Random$peel(seed1);
+				var n0 = elm$random$Random$peel(seed0);
+				var lo = (134217727 & n1) * 1.0;
+				var hi = (67108863 & n0) * 1.0;
+				var val = ((hi * 1.34217728e8) + lo) / 9.007199254740992e15;
+				var scaled = (val * range) + a;
+				return _Utils_Tuple2(
+					scaled,
+					elm$random$Random$next(seed1));
+			});
+	});
+var elm$random$Random$getByWeight = F3(
+	function (_n0, others, countdown) {
+		getByWeight:
+		while (true) {
+			var weight = _n0.a;
+			var value = _n0.b;
+			if (!others.b) {
+				return value;
+			} else {
+				var second = others.a;
+				var otherOthers = others.b;
+				if (_Utils_cmp(
+					countdown,
+					elm$core$Basics$abs(weight)) < 1) {
+					return value;
+				} else {
+					var $temp$_n0 = second,
+						$temp$others = otherOthers,
+						$temp$countdown = countdown - elm$core$Basics$abs(weight);
+					_n0 = $temp$_n0;
+					others = $temp$others;
+					countdown = $temp$countdown;
+					continue getByWeight;
+				}
+			}
+		}
+	});
+var elm$random$Random$map = F2(
+	function (func, _n0) {
+		var genA = _n0.a;
+		return elm$random$Random$Generator(
+			function (seed0) {
+				var _n1 = genA(seed0);
+				var a = _n1.a;
+				var seed1 = _n1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var elm$random$Random$weighted = F2(
+	function (first, others) {
+		var normalize = function (_n0) {
+			var weight = _n0.a;
+			return elm$core$Basics$abs(weight);
+		};
+		var total = normalize(first) + elm$core$List$sum(
+			A2(elm$core$List$map, normalize, others));
+		return A2(
+			elm$random$Random$map,
+			A2(elm$random$Random$getByWeight, first, others),
+			A2(elm$random$Random$float, 0, total));
+	});
+var author$project$Main$randomNoteGenerator = function (model) {
+	var knowledgeList = elm$core$Dict$toList(model.currentKnowledge);
+	var weightedKnowledge = A2(
+		elm$core$List$map,
+		function (_n0) {
+			var note = _n0.a;
+			var knowledge = _n0.b;
+			return _Utils_Tuple2(
+				author$project$Main$weighKnowledge(knowledge),
+				note);
+		},
+		knowledgeList);
+	var tail = A2(
+		elm$core$Maybe$withDefault,
+		_List_fromArray(
+			[
+				_Utils_Tuple2(1, 'C')
+			]),
+		elm$core$List$tail(weightedKnowledge));
+	var head = A2(
+		elm$core$Maybe$withDefault,
+		_Utils_Tuple2(1, 'C'),
+		elm$core$List$head(weightedKnowledge));
+	return A2(elm$random$Random$weighted, head, tail);
+};
+var elm$core$Basics$ge = _Utils_ge;
+var elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3(elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var author$project$Main$readyForNextLevel = function (currentKnowledge) {
+	return A3(
+		elm$core$Dict$foldl,
+		F3(
+			function (note, knowledge, ready) {
+				return ready && (knowledge >= 1);
+			}),
+		true,
+		currentKnowledge);
+};
 var elm$browser$Browser$External = function (a) {
 	return {$: 'External', a: a};
 };
@@ -6401,9 +6709,6 @@ var elm$core$String$left = F2(
 		return (n < 1) ? '' : A3(elm$core$String$slice, 0, n, string);
 	});
 var elm$core$String$length = _String_length;
-var elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var elm$core$String$right = F2(
 	function (n, string) {
 		return (n < 1) ? '' : A3(
@@ -7370,11 +7675,6 @@ var elm$browser$Debugger$Main$toBlockerType = function (model) {
 		elm$browser$Debugger$Main$isPaused(model.state),
 		model.overlay);
 };
-var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var elm$core$Dict$RBNode_elm_builtin = F5(
-	function (a, b, c, d, e) {
-		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
-	});
 var elm$core$Dict$map = F2(
 	function (func, dict) {
 		if (dict.$ === 'RBEmpty_elm_builtin') {
@@ -7530,112 +7830,6 @@ var elm$browser$Debugger$Metadata$decodeAlias = A3(
 var elm$browser$Debugger$Metadata$Union = F2(
 	function (args, tags) {
 		return {args: args, tags: tags};
-	});
-var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
-var elm$core$Dict$Black = {$: 'Black'};
-var elm$core$Basics$compare = _Utils_compare;
-var elm$core$Dict$Red = {$: 'Red'};
-var elm$core$Dict$balance = F5(
-	function (color, key, value, left, right) {
-		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
-			var _n1 = right.a;
-			var rK = right.b;
-			var rV = right.c;
-			var rLeft = right.d;
-			var rRight = right.e;
-			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
-				var _n3 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var lLeft = left.d;
-				var lRight = left.e;
-				return A5(
-					elm$core$Dict$RBNode_elm_builtin,
-					elm$core$Dict$Red,
-					key,
-					value,
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, lK, lV, lLeft, lRight),
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					elm$core$Dict$RBNode_elm_builtin,
-					color,
-					rK,
-					rV,
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Red, key, value, left, rLeft),
-					rRight);
-			}
-		} else {
-			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
-				var _n5 = left.a;
-				var lK = left.b;
-				var lV = left.c;
-				var _n6 = left.d;
-				var _n7 = _n6.a;
-				var llK = _n6.b;
-				var llV = _n6.c;
-				var llLeft = _n6.d;
-				var llRight = _n6.e;
-				var lRight = left.e;
-				return A5(
-					elm$core$Dict$RBNode_elm_builtin,
-					elm$core$Dict$Red,
-					lK,
-					lV,
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, llK, llV, llLeft, llRight),
-					A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, key, value, lRight, right));
-			} else {
-				return A5(elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
-			}
-		}
-	});
-var elm$core$Dict$insertHelp = F3(
-	function (key, value, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Red, key, value, elm$core$Dict$RBEmpty_elm_builtin, elm$core$Dict$RBEmpty_elm_builtin);
-		} else {
-			var nColor = dict.a;
-			var nKey = dict.b;
-			var nValue = dict.c;
-			var nLeft = dict.d;
-			var nRight = dict.e;
-			var _n1 = A2(elm$core$Basics$compare, key, nKey);
-			switch (_n1.$) {
-				case 'LT':
-					return A5(
-						elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						A3(elm$core$Dict$insertHelp, key, value, nLeft),
-						nRight);
-				case 'EQ':
-					return A5(elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
-				default:
-					return A5(
-						elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						nLeft,
-						A3(elm$core$Dict$insertHelp, key, value, nRight));
-			}
-		}
-	});
-var elm$core$Dict$insert = F3(
-	function (key, value, dict) {
-		var _n0 = A3(elm$core$Dict$insertHelp, key, value, dict);
-		if ((_n0.$ === 'RBNode_elm_builtin') && (_n0.a.$ === 'Red')) {
-			var _n1 = _n0.a;
-			var k = _n0.b;
-			var v = _n0.c;
-			var l = _n0.d;
-			var r = _n0.e;
-			return A5(elm$core$Dict$RBNode_elm_builtin, elm$core$Dict$Black, k, v, l, r);
-		} else {
-			var x = _n0;
-			return x;
-		}
 	});
 var elm$core$Dict$fromList = function (assocs) {
 	return A3(
@@ -7804,31 +7998,6 @@ var elm$browser$Debugger$Metadata$collectBadUnions = F3(
 				elm$core$List$cons,
 				A2(elm$browser$Debugger$Metadata$ProblemType, name, problems),
 				list);
-		}
-	});
-var elm$core$Dict$foldl = F3(
-	function (func, acc, dict) {
-		foldl:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return acc;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var $temp$func = func,
-					$temp$acc = A3(
-					func,
-					key,
-					value,
-					A3(elm$core$Dict$foldl, func, acc, left)),
-					$temp$dict = right;
-				func = $temp$func;
-				acc = $temp$acc;
-				dict = $temp$dict;
-				continue foldl;
-			}
 		}
 	});
 var elm$browser$Debugger$Metadata$isPortable = function (_n0) {
@@ -8633,10 +8802,7 @@ var elm$browser$Debugger$History$addRecent = F3(
 				A2(elm$core$List$cons, msg, messages),
 				numMessages + 1));
 	});
-var elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
 var elm$core$Array$bitMask = 4294967295 >>> (32 - elm$core$Array$shiftStep);
-var elm$core$Basics$ge = _Utils_ge;
-var elm$core$Bitwise$and = _Bitwise_and;
 var elm$core$Elm$JsArray$push = _JsArray_push;
 var elm$core$Elm$JsArray$singleton = _JsArray_singleton;
 var elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
@@ -9716,6 +9882,11 @@ var elm$url$Url$fromString = function (str) {
 };
 var elm$browser$Browser$Navigation$load = _Browser_load;
 var elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var elm$random$Random$step = F2(
+	function (_n0, seed) {
+		var generator = _n0.a;
+		return generator(seed);
+	});
 var elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
 		if (maybePort.$ === 'Nothing') {
@@ -9762,75 +9933,122 @@ var elm$url$Url$toString = function (url) {
 };
 var author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'LinkClicked':
-				var urlRequest = msg.a;
-				if (urlRequest.$ === 'Internal') {
-					var url = urlRequest.a;
+		update:
+		while (true) {
+			switch (msg.$) {
+				case 'LinkClicked':
+					var urlRequest = msg.a;
+					if (urlRequest.$ === 'Internal') {
+						var url = urlRequest.a;
+						return _Utils_Tuple2(
+							model,
+							A2(
+								elm$browser$Browser$Navigation$pushUrl,
+								model.key,
+								elm$url$Url$toString(url)));
+					} else {
+						var href = urlRequest.a;
+						return _Utils_Tuple2(
+							model,
+							elm$browser$Browser$Navigation$load(href));
+					}
+				case 'UrlChanged':
+					var url = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{url: url}),
+						elm$core$Platform$Cmd$none);
+				case 'StartGame':
+					return A2(
+						author$project$Main$update,
+						author$project$Main$NextLevel,
+						_Utils_update(
+							model,
+							{homescreen: false}));
+				case 'PlaySound':
+					var note = msg.a;
 					return _Utils_Tuple2(
 						model,
-						A2(
-							elm$browser$Browser$Navigation$pushUrl,
-							model.key,
-							elm$url$Url$toString(url)));
-				} else {
-					var href = urlRequest.a;
+						author$project$Main$playSound(note));
+				case 'Answer':
+					var note = msg.a;
+					return _Utils_eq(note, model.currentKey) ? _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								answer: elm$core$Maybe$Just(
+									_Utils_Tuple2(note, true)),
+								currentKnowledge: A3(elm$core$Dict$update, note, author$project$Main$increaseKnowledge, model.currentKnowledge),
+								points: model.points + 100
+							}),
+						elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									author$project$Main$playSound(note),
+									A2(author$project$Main$after, 1000, author$project$Main$NextLevel)
+								]))) : _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								answer: elm$core$Maybe$Just(
+									_Utils_Tuple2(note, false)),
+								currentKnowledge: A3(elm$core$Dict$update, note, author$project$Main$decreaseKnowledge, model.currentKnowledge)
+							}),
+						author$project$Main$playSound(note));
+				case 'NextSound':
+					var _n2 = A2(
+						elm$random$Random$step,
+						author$project$Main$randomNoteGenerator(model),
+						model.seed);
+					var nextNote = _n2.a;
+					var nextSeed = _n2.b;
 					return _Utils_Tuple2(
-						model,
-						elm$browser$Browser$Navigation$load(href));
-				}
-			case 'UrlChanged':
-				var url = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{url: url}),
-					elm$core$Platform$Cmd$none);
-			case 'StartGame':
-				return A2(
-					author$project$Main$update,
-					author$project$Main$NextLevel,
-					_Utils_update(
-						model,
-						{homescreen: false}));
-			case 'PlaySound':
-				var note = msg.a;
-				return _Utils_Tuple2(
-					model,
-					author$project$Main$playSound(note));
-			case 'Answer':
-				var note = msg.a;
-				return _Utils_eq(note, model.currentKey) ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{correctAnswer: true, points: model.points + 100}),
-					elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[
-								author$project$Main$playSound(note),
-								A2(author$project$Main$after, 1000, author$project$Main$NextLevel)
-							]))) : _Utils_Tuple2(
-					model,
-					author$project$Main$playSound(note));
-			default:
-				var newModel = author$project$Main$nextKey(
-					_Utils_update(
-						model,
-						{correctAnswer: false}));
-				return _Utils_Tuple2(
-					newModel,
-					A2(
-						author$project$Main$after,
-						200,
-						author$project$Main$PlaySound(newModel.currentKey)));
+						_Utils_update(
+							model,
+							{answer: elm$core$Maybe$Nothing, currentKey: nextNote, seed: nextSeed}),
+						author$project$Main$playSound(nextNote));
+				default:
+					if (author$project$Main$readyForNextLevel(model.currentKnowledge)) {
+						var newModel = author$project$Main$nextKey(
+							_Utils_update(
+								model,
+								{answer: elm$core$Maybe$Nothing}));
+						var $temp$msg = author$project$Main$NextSound,
+							$temp$model = newModel;
+						msg = $temp$msg;
+						model = $temp$model;
+						continue update;
+					} else {
+						var $temp$msg = author$project$Main$NextSound,
+							$temp$model = model;
+						msg = $temp$msg;
+						model = $temp$model;
+						continue update;
+					}
+			}
 		}
 	});
 var author$project$Main$Answer = function (a) {
 	return {$: 'Answer', a: a};
 };
 var author$project$Main$viewChoice = F4(
-	function (width, correct, correctNote, note) {
-		var buttonClass = (correct && _Utils_eq(correctNote, note)) ? 'button choice correct' : 'button choice';
+	function (width, prevAnswer, correctNote, note) {
+		var buttonClass = function () {
+			if (prevAnswer.$ === 'Nothing') {
+				return 'button choice';
+			} else {
+				if (prevAnswer.a.b) {
+					var _n1 = prevAnswer.a;
+					var answeredNote = _n1.a;
+					return _Utils_eq(answeredNote, note) ? 'button choice correct' : 'button choice';
+				} else {
+					var _n2 = prevAnswer.a;
+					var answeredNote = _n2.a;
+					return _Utils_eq(answeredNote, note) ? 'button choice incorrect' : 'button choice';
+				}
+			}
+		}();
 		return A2(
 			elm$html$Html$button,
 			_List_fromArray(
@@ -9860,8 +10078,11 @@ var author$project$Main$viewChoices = function (model) {
 			]),
 		A2(
 			elm$core$List$map,
-			A3(author$project$Main$viewChoice, widthPerChoice, model.correctAnswer, model.currentKey),
+			A3(author$project$Main$viewChoice, widthPerChoice, model.answer, model.currentKey),
 			model.keysTesting));
+};
+var author$project$Main$PlaySound = function (a) {
+	return {$: 'PlaySound', a: a};
 };
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$h3 = _VirtualDom_node('h3');
@@ -9889,6 +10110,17 @@ var author$project$Main$viewHeader = function (model) {
 							[
 								elm$html$Html$text('Pitch Perfect')
 							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('winner row grow')
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text(
+						model.winner ? 'PERFFECT PITCH!' : '')
 					])),
 				A2(
 				elm$html$Html$div,
@@ -9953,16 +10185,25 @@ var author$project$Main$viewHomescreen = function (model) {
 		elm$html$Html$div,
 		_List_fromArray(
 			[
-				elm$html$Html$Attributes$class('column center')
+				elm$html$Html$Attributes$class('column center homescreen')
 			]),
 		_List_fromArray(
 			[
 				A2(
-				elm$html$Html$h1,
-				_List_Nil,
+				elm$html$Html$div,
 				_List_fromArray(
 					[
-						elm$html$Html$text('Pitch Perfect')
+						elm$html$Html$Attributes$class('header')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$h1,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text('Pitch Perfect')
+							]))
 					])),
 				A2(
 				elm$html$Html$button,
@@ -9999,4 +10240,4 @@ var elm$browser$Browser$application = _Browser_application;
 var author$project$Main$main = elm$browser$Browser$application(
 	{init: author$project$Main$init, onUrlChange: author$project$Main$UrlChanged, onUrlRequest: author$project$Main$LinkClicked, subscriptions: author$project$Main$subscriptions, update: author$project$Main$update, view: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Main.Msg","aliases":{"Main.Note":{"args":[],"type":"String.String"},"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"}},"unions":{"Main.Msg":{"args":[],"tags":{"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"],"StartGame":[],"PlaySound":["Main.Note"],"Answer":["Main.Note"],"NextLevel":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}}}}})}});}(this));
+	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Main.Msg","aliases":{"Main.Note":{"args":[],"type":"String.String"},"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"}},"unions":{"Main.Msg":{"args":[],"tags":{"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"],"StartGame":[],"PlaySound":["Main.Note"],"Answer":["Main.Note"],"NextSound":[],"NextLevel":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}}}}})}});}(this));

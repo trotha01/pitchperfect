@@ -5,6 +5,9 @@
 
 html, body {
   height: 100%;
+  font-family: sans-serif;
+  font-weight: 500 !important;
+  letter-spacing: 0.2rem !important;
 }
 
 /* GENERIC  CLASSES */
@@ -41,8 +44,14 @@ html, body {
   height: 100%;
 }
 
+.homescreen {
+  height: 100%;
+}
+
 .header {
-  margin: 1rem;
+  padding: 1rem;
+  background-color: black;
+  color: #FFE400;
 }
 
 .controls {
@@ -60,11 +69,13 @@ html, body {
 
 .choice {
   flex-grow: 1;
-  /*flex-basis: 50%;*/
+  font-size: 15rem;
 }
 
 .start-button {
   height: 100%; 
+  color: #FFE400;
+  background-color: black;
 }
 
 .replay-button {
@@ -80,5 +91,14 @@ html, body {
 }
 
 .correct {
-  background-color: green;
+  background-color: #14A76C;
+}
+
+.incorrect {
+  background-color: #FF652F;
+}
+
+.winner {
+  color: green;
+  justify-content: flex-end;
 }

@@ -2,10 +2,12 @@ port module Main exposing (Model, Msg(..), Note, init, initialModel, main, playS
 
 import Browser
 import Browser.Navigation as Nav
+import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Process
+import Random
 import Task
 import Url
 
@@ -41,12 +43,21 @@ type alias Model =
     , currentKey : Note
     , keysTesting : List Note
     , keysToTest : List Note
-    , correctAnswer : Bool
+    , answer : Maybe ( Note, Bool )
+    , currentKnowledge : Dict Note Knowledge
+    , winner : Bool
+
+    -- randomness
+    , seed : Random.Seed
     }
 
 
 type alias Note =
     String
+
+
+type alias Knowledge =
+    Float
 
 
 initialModel key url =
@@ -60,7 +71,12 @@ initialModel key url =
     , currentKey = ""
     , keysTesting = []
     , keysToTest = [ "C", "D", "E", "F", "G", "A", "B" ]
-    , correctAnswer = False
+    , answer = Nothing
+    , currentKnowledge = Dict.empty
+    , winner = False
+
+    -- randomness
+    , seed = Random.initialSeed 0
     }
 
 
@@ -79,6 +95,7 @@ type Msg
     | StartGame
     | PlaySound Note
     | Answer Note
+    | NextSound
     | NextLevel
 
 
@@ -109,7 +126,11 @@ update msg model =
 
         Answer note ->
             if note == model.currentKey then
-                ( { model | points = model.points + 100, correctAnswer = True }
+                ( { model
+                    | points = model.points + 100
+                    , answer = Just ( note, True )
+                    , currentKnowledge = Dict.update note increaseKnowledge model.currentKnowledge
+                  }
                 , Cmd.batch
                     [ playSound note
                     , after 1000 NextLevel
@@ -117,35 +138,116 @@ update msg model =
                 )
 
             else
-                ( model, playSound note )
+                ( { model
+                    | currentKnowledge = Dict.update note decreaseKnowledge model.currentKnowledge
+                    , answer = Just ( note, False )
+                  }
+                , playSound note
+                )
+
+        NextSound ->
+            let
+                ( nextNote, nextSeed ) =
+                    Random.step (randomNoteGenerator model) model.seed
+            in
+            ( { model
+                | answer = Nothing
+                , seed = nextSeed
+                , currentKey = nextNote
+              }
+            , playSound nextNote
+            )
 
         NextLevel ->
-            let
-                newModel =
-                    { model | correctAnswer = False }
-                        |> nextKey
-            in
-            ( newModel, after 200 <| PlaySound newModel.currentKey )
+            if readyForNextLevel model.currentKnowledge then
+                let
+                    newModel =
+                        { model | answer = Nothing }
+                            |> nextKey
+                in
+                update NextSound newModel
+
+            else
+                update NextSound model
+
+
+randomNoteGenerator : Model -> Random.Generator Note
+randomNoteGenerator model =
+    let
+        knowledgeList =
+            Dict.toList model.currentKnowledge
+
+        weightedKnowledge =
+            List.map (\( note, knowledge ) -> ( weighKnowledge knowledge, note )) knowledgeList
+
+        head =
+            List.head weightedKnowledge |> Maybe.withDefault ( 1, "C" )
+
+        tail =
+            List.tail weightedKnowledge |> Maybe.withDefault [ ( 1, "C" ) ]
+    in
+    Random.weighted head tail
+
+
+weighKnowledge : Knowledge -> Float
+weighKnowledge knowledge =
+    if knowledge == 0 then
+        2
+
+    else
+        1 / knowledge
+
+
+readyForNextLevel : Dict Note Knowledge -> Bool
+readyForNextLevel currentKnowledge =
+    Dict.foldl (\note knowledge ready -> ready && knowledge >= 1) True currentKnowledge
+
+
+increaseKnowledge : Maybe Knowledge -> Maybe Knowledge
+increaseKnowledge knowledge =
+    case knowledge of
+        Nothing ->
+            Just 1
+
+        Just v ->
+            Just (v + 1)
+
+
+decreaseKnowledge : Maybe Knowledge -> Maybe Knowledge
+decreaseKnowledge knowledge =
+    case knowledge of
+        Nothing ->
+            Just 0
+
+        Just v ->
+            Just (v - 1)
 
 
 nextKey : Model -> Model
 nextKey model =
     let
-        ( newKey, keysRemaining ) =
+        ( nextNote, keysRemaining ) =
             case List.head model.keysToTest of
                 Just key ->
-                    ( key, List.tail model.keysToTest |> Maybe.withDefault model.keysToTest )
+                    ( Just key, List.tail model.keysToTest |> Maybe.withDefault model.keysToTest )
 
                 Nothing ->
                     -- this should never happen
-                    ( "C", model.keysToTest )
+                    ( Nothing, model.keysToTest )
     in
-    { model
-        | homescreen = False
-        , currentKey = newKey
-        , keysTesting = newKey :: model.keysTesting
-        , keysToTest = keysRemaining
-    }
+    case nextNote of
+        Nothing ->
+            -- YOU WIN!!!
+            { model | winner = True }
+
+        Just newKey ->
+            { model
+                | homescreen = False
+                , currentKey = newKey
+                , currentKnowledge = Dict.insert newKey 0 model.currentKnowledge
+                , keysTesting = newKey :: model.keysTesting
+                , keysToTest = keysRemaining
+            }
 
 
 
@@ -192,8 +294,10 @@ view model =
 
 viewHomescreen : Model -> Html.Html Msg
 viewHomescreen model =
-    div [ class "column center" ]
-        [ h1 [] [ text "Pitch Perfect" ]
+    div [ class "column center homescreen" ]
+        [ div [ class "header" ]
+            [ h1 [] [ text "Pitch Perfect" ]
+            ]
         , button [ class "start-button button", onClick StartGame ] [ h2 [] [ text "Start" ] ]
         ]
 
@@ -210,6 +314,14 @@ viewHeader model =
     div [ class "row header" ]
         [ div [ class "title row grow-2" ]
             [ h1 [] [ text "Pitch Perfect" ]
+            ]
+        , div [ class "winner row grow" ]
+            [ text <|
+                if model.winner then
+                    "PERFFECT PITCH!"
+
+                else
+                    ""
             ]
         , div [ class "controls row grow" ]
             [ button [ class "button replay-button", onClick (PlaySound model.currentKey) ] [ text "Replay Sound" ] ]
@@ -228,18 +340,30 @@ viewChoices model =
             widthFromChoiceCount (List.length choices)
     in
     div [ class "row choices" ]
-        (List.map (viewChoice widthPerChoice model.correctAnswer model.currentKey) model.keysTesting)
+        (List.map (viewChoice widthPerChoice model.answer model.currentKey) model.keysTesting)
 
 
-viewChoice : String -> Bool -> Note -> Note -> Html.Html Msg
-viewChoice width correct correctNote note =
+viewChoice : String -> Maybe ( Note, Bool ) -> Note -> Note -> Html.Html Msg
+viewChoice width prevAnswer correctNote note =
     let
         buttonClass =
-            if correct && correctNote == note then
-                "button choice correct"
+            case prevAnswer of
+                Nothing ->
+                    "button choice"
 
-            else
-                "button choice"
+                Just ( answeredNote, True ) ->
+                    if answeredNote == note then
+                        "button choice correct"
+
+                    else
+                        "button choice"
+
+                Just ( answeredNote, False ) ->
+                    if answeredNote == note then
+                        "button choice incorrect"
+
+                    else
+                        "button choice"
     in
     button [ class buttonClass, style "flex-basis" width, onClick (Answer note) ] [ text note ]
 
