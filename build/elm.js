@@ -5898,16 +5898,18 @@ var elm$core$Dict$foldl = F3(
 			}
 		}
 	});
-var author$project$Main$readyForNextLevel = function (currentKnowledge) {
-	return A3(
-		elm$core$Dict$foldl,
-		F3(
-			function (note, knowledge, ready) {
-				return ready && (knowledge >= 1);
-			}),
-		true,
-		currentKnowledge);
-};
+var author$project$Main$readyForNextLevel = F2(
+	function (keysTesting, currentKnowledge) {
+		var knowledgeNeeded = elm$core$List$length(keysTesting);
+		return A3(
+			elm$core$Dict$foldl,
+			F3(
+				function (note, knowledge, ready) {
+					return ready && (_Utils_cmp(knowledge, knowledgeNeeded) > -1);
+				}),
+			true,
+			currentKnowledge);
+	});
 var elm$browser$Browser$External = function (a) {
 	return {$: 'External', a: a};
 };
@@ -10009,7 +10011,7 @@ var author$project$Main$update = F2(
 							{answer: elm$core$Maybe$Nothing, currentKey: nextNote, seed: nextSeed}),
 						author$project$Main$playSound(nextNote));
 				default:
-					if (author$project$Main$readyForNextLevel(model.currentKnowledge)) {
+					if (A2(author$project$Main$readyForNextLevel, model.keysTesting, model.currentKnowledge)) {
 						var newModel = author$project$Main$nextKey(
 							_Utils_update(
 								model,
@@ -10179,7 +10181,7 @@ var author$project$Main$viewGame = function (model) {
 			]));
 };
 var author$project$Main$StartGame = {$: 'StartGame'};
-var elm$html$Html$h2 = _VirtualDom_node('h2');
+var elm$html$Html$i = _VirtualDom_node('i');
 var author$project$Main$viewHomescreen = function (model) {
 	return A2(
 		elm$html$Html$div,
@@ -10215,12 +10217,12 @@ var author$project$Main$viewHomescreen = function (model) {
 				_List_fromArray(
 					[
 						A2(
-						elm$html$Html$h2,
-						_List_Nil,
+						elm$html$Html$i,
 						_List_fromArray(
 							[
-								elm$html$Html$text('Start')
-							]))
+								elm$html$Html$Attributes$class('fas fa-play')
+							]),
+						_List_Nil)
 					]))
 			]));
 };

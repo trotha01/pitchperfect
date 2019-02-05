@@ -73,9 +73,14 @@ html, body {
 }
 
 .start-button {
+  font-size: 8rem;
   height: 100%; 
   color: #FFE400;
   background-color: black;
+}
+
+.start-button:hover {
+  font-size: 9rem;
 }
 
 .replay-button {

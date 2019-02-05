@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Pitch Perfect</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css">
   <script src="elm.js"></script>
   <script src="simpleTones.js"></script>
@@ -17,7 +18,6 @@
 
   var timeout;
   app.ports.playSound.subscribe(function(sound) {
-    console.log(sound);
     window.clearTimeout(timeout);
     timeout = window.setTimeout(function() {playTone(sound)}, 200)
   });

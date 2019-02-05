@@ -159,7 +159,7 @@ update msg model =
             )
 
         NextLevel ->
-            if readyForNextLevel model.currentKnowledge then
+            if readyForNextLevel model.keysTesting model.currentKnowledge then
                 let
                     newModel =
                         { model | answer = Nothing }
@@ -198,9 +198,13 @@ weighKnowledge knowledge =
         1 / knowledge
 
 
-readyForNextLevel : Dict Note Knowledge -> Bool
-readyForNextLevel currentKnowledge =
-    Dict.foldl (\note knowledge ready -> ready && knowledge >= 1) True currentKnowledge
+readyForNextLevel : List Note -> Dict Note Knowledge -> Bool
+readyForNextLevel keysTesting currentKnowledge =
+    let
+        knowledgeNeeded =
+            List.length keysTesting |> toFloat
+    in
+    Dict.foldl (\note knowledge ready -> ready && knowledge >= knowledgeNeeded) True currentKnowledge
 
 
 increaseKnowledge : Maybe Knowledge -> Maybe Knowledge
@@ -298,7 +302,8 @@ viewHomescreen model =
         [ div [ class "header" ]
             [ h1 [] [ text "Pitch Perfect" ]
             ]
-        , button [ class "start-button button", onClick StartGame ] [ h2 [] [ text "Start" ] ]
+        , button [ class "start-button button", onClick StartGame ]
+            [ i [ class "fas fa-play" ] [] ]
         ]
 
 
