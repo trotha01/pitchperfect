@@ -107,3 +107,15 @@ html, body {
   color: green;
   justify-content: flex-end;
 }
+
+svg {
+  width: 100px;
+  height: 100px;
+}
+
+svg path {
+  stroke: blue;
+  stroke-width: 10px;
+  stroke-linecap: round;
+  fill: none;
+}

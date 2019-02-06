@@ -10181,6 +10181,71 @@ var author$project$Main$viewGame = function (model) {
 			]));
 };
 var author$project$Main$StartGame = {$: 'StartGame'};
+var elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var elm$svg$Svg$animate = elm$svg$Svg$trustedNode('animate');
+var elm$svg$Svg$path = elm$svg$Svg$trustedNode('path');
+var elm$svg$Svg$svg = elm$svg$Svg$trustedNode('svg');
+var elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
+var elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
+var elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var elm$svg$Svg$Attributes$dur = _VirtualDom_attribute('dur');
+var elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var elm$svg$Svg$Attributes$from = function (value) {
+	return A2(
+		_VirtualDom_attribute,
+		'from',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
+var elm$svg$Svg$Attributes$to = function (value) {
+	return A2(
+		_VirtualDom_attribute,
+		'to',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var author$project$Main$viewSoundWave = function (model) {
+	return A2(
+		elm$svg$Svg$svg,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						elm$svg$Svg$Attributes$d('M10,10 L50,100 L90,50')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$svg$Svg$animate,
+						_List_fromArray(
+							[
+								elm$svg$Svg$Attributes$id('anim1'),
+								elm$svg$Svg$Attributes$from('M0,50 L33,0 L66,100 L100,50'),
+								elm$svg$Svg$Attributes$to('M0,50 L33,100 L66,0 L100,50'),
+								elm$svg$Svg$Attributes$attributeName('d'),
+								elm$svg$Svg$Attributes$dur('1s'),
+								elm$svg$Svg$Attributes$begin('0s; anim2.end'),
+								elm$svg$Svg$Attributes$fill('freeze')
+							]),
+						_List_Nil),
+						A2(
+						elm$svg$Svg$animate,
+						_List_fromArray(
+							[
+								elm$svg$Svg$Attributes$id('anim2'),
+								elm$svg$Svg$Attributes$from('M0,50 L33,100 L66,0 L100,50'),
+								elm$svg$Svg$Attributes$to('M0,50 L33,0 L66,100 L100,50'),
+								elm$svg$Svg$Attributes$attributeName('d'),
+								elm$svg$Svg$Attributes$dur('1s'),
+								elm$svg$Svg$Attributes$begin('anim1.end'),
+								elm$svg$Svg$Attributes$fill('freeze')
+							]),
+						_List_Nil)
+					]))
+			]));
+};
 var elm$html$Html$i = _VirtualDom_node('i');
 var author$project$Main$viewHomescreen = function (model) {
 	return A2(
@@ -10223,7 +10288,8 @@ var author$project$Main$viewHomescreen = function (model) {
 								elm$html$Html$Attributes$class('fas fa-play')
 							]),
 						_List_Nil)
-					]))
+					])),
+				author$project$Main$viewSoundWave(model)
 			]));
 };
 var author$project$Main$view = function (model) {

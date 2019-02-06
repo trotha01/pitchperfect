@@ -8,6 +8,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Process
 import Random
+import Svg
+import Svg.Attributes as SvgAttr exposing (attributeName, d, from, to, x, y)
 import Task
 import Url
 
@@ -304,6 +306,7 @@ viewHomescreen model =
             ]
         , button [ class "start-button button", onClick StartGame ]
             [ i [ class "fas fa-play" ] [] ]
+        , viewSoundWave model
         ]
 
 
@@ -332,6 +335,37 @@ viewHeader model =
             [ button [ class "button replay-button", onClick (PlaySound model.currentKey) ] [ text "Replay Sound" ] ]
         , div [ class "status row grow" ]
             [ h3 [ class "points" ] [ text (String.fromInt model.points) ] ]
+        ]
+
+
+viewSoundWave : Model -> Html.Html Msg
+viewSoundWave model =
+    Svg.svg
+        []
+        [ Svg.path
+            [ d "M10,10 L50,100 L90,50"
+            ]
+            [ Svg.animate
+                [ SvgAttr.id "anim1"
+                , from "M0,50 L33,0 L66,100 L100,50"
+                , to "M0,50 L33,100 L66,0 L100,50"
+                , attributeName "d"
+                , SvgAttr.dur "1s"
+                , SvgAttr.begin "0s; anim2.end"
+                , SvgAttr.fill "freeze"
+                ]
+                []
+            , Svg.animate
+                [ SvgAttr.id "anim2"
+                , from "M0,50 L33,100 L66,0 L100,50"
+                , to "M0,50 L33,0 L66,100 L100,50"
+                , attributeName "d"
+                , SvgAttr.dur "1s"
+                , SvgAttr.begin "anim1.end"
+                , SvgAttr.fill "freeze"
+                ]
+                []
+            ]
         ]
 
 
