@@ -340,28 +340,54 @@ viewHeader model =
 
 viewSoundWave : Model -> Html.Html Msg
 viewSoundWave model =
+    let
+        ( minX, minY ) =
+            ( 0, 10 )
+
+        ( maxX, maxY ) =
+            ( 100, 80 )
+
+        fromPath =
+            "M0,50 L10,45 L20,55 L30,35 L40,55 L50,50"
+
+        toPath =
+            "M0,50 L10,50 L20,45 L30,55 L40,45 L50,50"
+
+        toPath2 =
+            "M0,50 L10,40 L20,35 L30,45 L40,65 L50,50"
+    in
     Svg.svg
         []
         [ Svg.path
-            [ d "M10,10 L50,100 L90,50"
+            [ d fromPath
             ]
             [ Svg.animate
                 [ SvgAttr.id "anim1"
-                , from "M0,50 L33,0 L66,100 L100,50"
-                , to "M0,50 L33,100 L66,0 L100,50"
+                , from fromPath
+                , to toPath
                 , attributeName "d"
-                , SvgAttr.dur "1s"
-                , SvgAttr.begin "0s; anim2.end"
+                , SvgAttr.dur "0.2s"
+                , SvgAttr.begin "0s; anim3.end"
                 , SvgAttr.fill "freeze"
                 ]
                 []
             , Svg.animate
                 [ SvgAttr.id "anim2"
-                , from "M0,50 L33,100 L66,0 L100,50"
-                , to "M0,50 L33,0 L66,100 L100,50"
+                , from toPath
+                , to toPath2
                 , attributeName "d"
-                , SvgAttr.dur "1s"
+                , SvgAttr.dur "0.2s"
                 , SvgAttr.begin "anim1.end"
+                , SvgAttr.fill "freeze"
+                ]
+                []
+            , Svg.animate
+                [ SvgAttr.id "anim3"
+                , from toPath2
+                , to fromPath
+                , attributeName "d"
+                , SvgAttr.dur "0.2s"
+                , SvgAttr.begin "anim2.end"
                 , SvgAttr.fill "freeze"
                 ]
                 []

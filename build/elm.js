@@ -10204,6 +10204,15 @@ var elm$svg$Svg$Attributes$to = function (value) {
 		_VirtualDom_noJavaScriptUri(value));
 };
 var author$project$Main$viewSoundWave = function (model) {
+	var toPath2 = 'M0,50 L10,40 L20,35 L30,45 L40,65 L50,50';
+	var toPath = 'M0,50 L10,50 L20,45 L30,55 L40,45 L50,50';
+	var fromPath = 'M0,50 L10,45 L20,55 L30,35 L40,55 L50,50';
+	var _n0 = _Utils_Tuple2(0, 10);
+	var minX = _n0.a;
+	var minY = _n0.b;
+	var _n1 = _Utils_Tuple2(100, 80);
+	var maxX = _n1.a;
+	var maxY = _n1.b;
 	return A2(
 		elm$svg$Svg$svg,
 		_List_Nil,
@@ -10213,7 +10222,7 @@ var author$project$Main$viewSoundWave = function (model) {
 				elm$svg$Svg$path,
 				_List_fromArray(
 					[
-						elm$svg$Svg$Attributes$d('M10,10 L50,100 L90,50')
+						elm$svg$Svg$Attributes$d(fromPath)
 					]),
 				_List_fromArray(
 					[
@@ -10222,11 +10231,11 @@ var author$project$Main$viewSoundWave = function (model) {
 						_List_fromArray(
 							[
 								elm$svg$Svg$Attributes$id('anim1'),
-								elm$svg$Svg$Attributes$from('M0,50 L33,0 L66,100 L100,50'),
-								elm$svg$Svg$Attributes$to('M0,50 L33,100 L66,0 L100,50'),
+								elm$svg$Svg$Attributes$from(fromPath),
+								elm$svg$Svg$Attributes$to(toPath),
 								elm$svg$Svg$Attributes$attributeName('d'),
-								elm$svg$Svg$Attributes$dur('1s'),
-								elm$svg$Svg$Attributes$begin('0s; anim2.end'),
+								elm$svg$Svg$Attributes$dur('0.2s'),
+								elm$svg$Svg$Attributes$begin('0s; anim3.end'),
 								elm$svg$Svg$Attributes$fill('freeze')
 							]),
 						_List_Nil),
@@ -10235,11 +10244,24 @@ var author$project$Main$viewSoundWave = function (model) {
 						_List_fromArray(
 							[
 								elm$svg$Svg$Attributes$id('anim2'),
-								elm$svg$Svg$Attributes$from('M0,50 L33,100 L66,0 L100,50'),
-								elm$svg$Svg$Attributes$to('M0,50 L33,0 L66,100 L100,50'),
+								elm$svg$Svg$Attributes$from(toPath),
+								elm$svg$Svg$Attributes$to(toPath2),
 								elm$svg$Svg$Attributes$attributeName('d'),
-								elm$svg$Svg$Attributes$dur('1s'),
+								elm$svg$Svg$Attributes$dur('0.2s'),
 								elm$svg$Svg$Attributes$begin('anim1.end'),
+								elm$svg$Svg$Attributes$fill('freeze')
+							]),
+						_List_Nil),
+						A2(
+						elm$svg$Svg$animate,
+						_List_fromArray(
+							[
+								elm$svg$Svg$Attributes$id('anim3'),
+								elm$svg$Svg$Attributes$from(toPath2),
+								elm$svg$Svg$Attributes$to(fromPath),
+								elm$svg$Svg$Attributes$attributeName('d'),
+								elm$svg$Svg$Attributes$dur('0.2s'),
+								elm$svg$Svg$Attributes$begin('anim2.end'),
 								elm$svg$Svg$Attributes$fill('freeze')
 							]),
 						_List_Nil)
