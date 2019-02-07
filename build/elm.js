@@ -4993,6 +4993,7 @@ var author$project$Main$initialModel = F2(
 			keysTesting: _List_Nil,
 			keysToTest: _List_fromArray(
 				['C', 'D', 'E', 'F', 'G', 'A', 'B']),
+			playingSound: false,
 			points: 0,
 			seed: elm$random$Random$initialSeed(0),
 			url: url,
@@ -5402,6 +5403,7 @@ var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (_n0) {
 	return elm$core$Platform$Sub$none;
 };
+var author$project$Main$DonePlayingSound = {$: 'DonePlayingSound'};
 var author$project$Main$NextLevel = {$: 'NextLevel'};
 var author$project$Main$NextSound = {$: 'NextSound'};
 var elm$core$Basics$always = F2(
@@ -9971,8 +9973,21 @@ var author$project$Main$update = F2(
 				case 'PlaySound':
 					var note = msg.a;
 					return _Utils_Tuple2(
-						model,
-						author$project$Main$playSound(note));
+						_Utils_update(
+							model,
+							{playingSound: true}),
+						elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									author$project$Main$playSound(note),
+									A2(author$project$Main$after, 1000, author$project$Main$DonePlayingSound)
+								])));
+				case 'DonePlayingSound':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{playingSound: false}),
+						elm$core$Platform$Cmd$none);
 				case 'Answer':
 					var note = msg.a;
 					return _Utils_eq(note, model.currentKey) ? _Utils_Tuple2(
@@ -10086,6 +10101,103 @@ var author$project$Main$viewChoices = function (model) {
 var author$project$Main$PlaySound = function (a) {
 	return {$: 'PlaySound', a: a};
 };
+var elm$core$Basics$cos = _Basics_cos;
+var elm$core$Basics$sin = _Basics_sin;
+var elm$core$String$fromFloat = _String_fromNumber;
+var elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var elm$svg$Svg$path = elm$svg$Svg$trustedNode('path');
+var elm$svg$Svg$svg = elm$svg$Svg$trustedNode('svg');
+var elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var author$project$Main$viewSoundWave = function (model) {
+	var xs = A2(
+		elm$core$List$map,
+		elm$core$Basics$toFloat,
+		A2(elm$core$List$range, 1, 100));
+	var _n0 = _Utils_Tuple2(20, 5);
+	var verticalSpreadFactor = _n0.a;
+	var horizontalSpreadFactor = _n0.b;
+	var cosYs = A2(
+		elm$core$List$map,
+		function (x) {
+			return 50 + (elm$core$Basics$cos(x / horizontalSpreadFactor) * verticalSpreadFactor);
+		},
+		xs);
+	var cosCoords = A3(elm$core$List$map2, elm$core$Tuple$pair, xs, cosYs);
+	var cosPath = function (p) {
+		return 'M' + p;
+	}(
+		A2(
+			elm$core$String$dropLeft,
+			2,
+			A3(
+				elm$core$List$foldl,
+				F2(
+					function (_n2, pathAcc) {
+						var x = _n2.a;
+						var y = _n2.b;
+						return pathAcc + (' L' + (elm$core$String$fromFloat(x) + (',' + elm$core$String$fromFloat(y))));
+					}),
+				'',
+				cosCoords)));
+	var sinYs = A2(
+		elm$core$List$map,
+		function (x) {
+			return 50 + (elm$core$Basics$sin(x / horizontalSpreadFactor) * verticalSpreadFactor);
+		},
+		xs);
+	var sinCoords = A3(elm$core$List$map2, elm$core$Tuple$pair, xs, sinYs);
+	var sinPath = function (p) {
+		return 'M' + p;
+	}(
+		A2(
+			elm$core$String$dropLeft,
+			2,
+			A3(
+				elm$core$List$foldl,
+				F2(
+					function (_n1, pathAcc) {
+						var x = _n1.a;
+						var y = _n1.b;
+						return pathAcc + (' L' + (elm$core$String$fromFloat(x) + (',' + elm$core$String$fromFloat(y))));
+					}),
+				'',
+				sinCoords)));
+	return A2(
+		elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				elm$svg$Svg$Attributes$viewBox('0 0 100 100')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$svg$Svg$path,
+				_List_fromArray(
+					[
+						elm$svg$Svg$Attributes$d(sinPath)
+					]),
+				_List_Nil)
+			]));
+};
+var author$project$Main$viewReplayButton = function (model) {
+	return model.playingSound ? author$project$Main$viewSoundWave(model) : A2(
+		elm$html$Html$button,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('button replay-button'),
+				elm$html$Html$Events$onClick(
+				author$project$Main$PlaySound(model.currentKey))
+			]),
+		_List_fromArray(
+			[
+				elm$html$Html$text('Replay Sound')
+			]));
+};
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$h3 = _VirtualDom_node('h3');
 var author$project$Main$viewHeader = function (model) {
@@ -10132,18 +10244,7 @@ var author$project$Main$viewHeader = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2(
-						elm$html$Html$button,
-						_List_fromArray(
-							[
-								elm$html$Html$Attributes$class('button replay-button'),
-								elm$html$Html$Events$onClick(
-								author$project$Main$PlaySound(model.currentKey))
-							]),
-						_List_fromArray(
-							[
-								elm$html$Html$text('Replay Sound')
-							]))
+						author$project$Main$viewReplayButton(model)
 					])),
 				A2(
 				elm$html$Html$div,
@@ -10181,93 +10282,6 @@ var author$project$Main$viewGame = function (model) {
 			]));
 };
 var author$project$Main$StartGame = {$: 'StartGame'};
-var elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var elm$svg$Svg$animate = elm$svg$Svg$trustedNode('animate');
-var elm$svg$Svg$path = elm$svg$Svg$trustedNode('path');
-var elm$svg$Svg$svg = elm$svg$Svg$trustedNode('svg');
-var elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
-var elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
-var elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var elm$svg$Svg$Attributes$dur = _VirtualDom_attribute('dur');
-var elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var elm$svg$Svg$Attributes$from = function (value) {
-	return A2(
-		_VirtualDom_attribute,
-		'from',
-		_VirtualDom_noJavaScriptUri(value));
-};
-var elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
-var elm$svg$Svg$Attributes$to = function (value) {
-	return A2(
-		_VirtualDom_attribute,
-		'to',
-		_VirtualDom_noJavaScriptUri(value));
-};
-var author$project$Main$viewSoundWave = function (model) {
-	var toPath2 = 'M0,50 L10,40 L20,35 L30,45 L40,65 L50,50';
-	var toPath = 'M0,50 L10,50 L20,45 L30,55 L40,45 L50,50';
-	var fromPath = 'M0,50 L10,45 L20,55 L30,35 L40,55 L50,50';
-	var _n0 = _Utils_Tuple2(0, 10);
-	var minX = _n0.a;
-	var minY = _n0.b;
-	var _n1 = _Utils_Tuple2(100, 80);
-	var maxX = _n1.a;
-	var maxY = _n1.b;
-	return A2(
-		elm$svg$Svg$svg,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						elm$svg$Svg$Attributes$d(fromPath)
-					]),
-				_List_fromArray(
-					[
-						A2(
-						elm$svg$Svg$animate,
-						_List_fromArray(
-							[
-								elm$svg$Svg$Attributes$id('anim1'),
-								elm$svg$Svg$Attributes$from(fromPath),
-								elm$svg$Svg$Attributes$to(toPath),
-								elm$svg$Svg$Attributes$attributeName('d'),
-								elm$svg$Svg$Attributes$dur('0.2s'),
-								elm$svg$Svg$Attributes$begin('0s; anim3.end'),
-								elm$svg$Svg$Attributes$fill('freeze')
-							]),
-						_List_Nil),
-						A2(
-						elm$svg$Svg$animate,
-						_List_fromArray(
-							[
-								elm$svg$Svg$Attributes$id('anim2'),
-								elm$svg$Svg$Attributes$from(toPath),
-								elm$svg$Svg$Attributes$to(toPath2),
-								elm$svg$Svg$Attributes$attributeName('d'),
-								elm$svg$Svg$Attributes$dur('0.2s'),
-								elm$svg$Svg$Attributes$begin('anim1.end'),
-								elm$svg$Svg$Attributes$fill('freeze')
-							]),
-						_List_Nil),
-						A2(
-						elm$svg$Svg$animate,
-						_List_fromArray(
-							[
-								elm$svg$Svg$Attributes$id('anim3'),
-								elm$svg$Svg$Attributes$from(toPath2),
-								elm$svg$Svg$Attributes$to(fromPath),
-								elm$svg$Svg$Attributes$attributeName('d'),
-								elm$svg$Svg$Attributes$dur('0.2s'),
-								elm$svg$Svg$Attributes$begin('anim2.end'),
-								elm$svg$Svg$Attributes$fill('freeze')
-							]),
-						_List_Nil)
-					]))
-			]));
-};
 var elm$html$Html$i = _VirtualDom_node('i');
 var author$project$Main$viewHomescreen = function (model) {
 	return A2(
@@ -10330,4 +10344,4 @@ var elm$browser$Browser$application = _Browser_application;
 var author$project$Main$main = elm$browser$Browser$application(
 	{init: author$project$Main$init, onUrlChange: author$project$Main$UrlChanged, onUrlRequest: author$project$Main$LinkClicked, subscriptions: author$project$Main$subscriptions, update: author$project$Main$update, view: author$project$Main$view});
 _Platform_export({'Main':{'init':author$project$Main$main(
-	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Main.Msg","aliases":{"Main.Note":{"args":[],"type":"String.String"},"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"}},"unions":{"Main.Msg":{"args":[],"tags":{"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"],"StartGame":[],"PlaySound":["Main.Note"],"Answer":["Main.Note"],"NextSound":[],"NextLevel":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}}}}})}});}(this));
+	elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.0"},"types":{"message":"Main.Msg","aliases":{"Main.Note":{"args":[],"type":"String.String"},"Url.Url":{"args":[],"type":"{ protocol : Url.Protocol, host : String.String, port_ : Maybe.Maybe Basics.Int, path : String.String, query : Maybe.Maybe String.String, fragment : Maybe.Maybe String.String }"}},"unions":{"Main.Msg":{"args":[],"tags":{"LinkClicked":["Browser.UrlRequest"],"UrlChanged":["Url.Url"],"StartGame":[],"PlaySound":["Main.Note"],"DonePlayingSound":[],"Answer":["Main.Note"],"NextSound":[],"NextLevel":[]}},"Browser.UrlRequest":{"args":[],"tags":{"Internal":["Url.Url"],"External":["String.String"]}},"Basics.Int":{"args":[],"tags":{"Int":[]}},"Maybe.Maybe":{"args":["a"],"tags":{"Just":["a"],"Nothing":[]}},"String.String":{"args":[],"tags":{"String":[]}},"Url.Protocol":{"args":[],"tags":{"Http":[],"Https":[]}}}}})}});}(this));

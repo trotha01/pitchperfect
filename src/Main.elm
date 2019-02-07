@@ -48,6 +48,7 @@ type alias Model =
     , answer : Maybe ( Note, Bool )
     , currentKnowledge : Dict Note Knowledge
     , winner : Bool
+    , playingSound : Bool
 
     -- randomness
     , seed : Random.Seed
@@ -76,6 +77,7 @@ initialModel key url =
     , answer = Nothing
     , currentKnowledge = Dict.empty
     , winner = False
+    , playingSound = False
 
     -- randomness
     , seed = Random.initialSeed 0
@@ -96,6 +98,7 @@ type Msg
     | UrlChanged Url.Url
     | StartGame
     | PlaySound Note
+    | DonePlayingSound
     | Answer Note
     | NextSound
     | NextLevel
@@ -124,7 +127,15 @@ update msg model =
                 |> update NextLevel
 
         PlaySound note ->
-            ( model, playSound note )
+            ( { model | playingSound = True }
+            , Cmd.batch
+                [ playSound note
+                , after 1000 DonePlayingSound
+                ]
+            )
+
+        DonePlayingSound ->
+            ( { model | playingSound = False }, Cmd.none )
 
         Answer note ->
             if note == model.currentKey then
@@ -332,65 +343,110 @@ viewHeader model =
                     ""
             ]
         , div [ class "controls row grow" ]
-            [ button [ class "button replay-button", onClick (PlaySound model.currentKey) ] [ text "Replay Sound" ] ]
+            [ viewReplayButton model ]
         , div [ class "status row grow" ]
             [ h3 [ class "points" ] [ text (String.fromInt model.points) ] ]
         ]
 
 
+viewReplayButton : Model -> Html.Html Msg
+viewReplayButton model =
+    if model.playingSound then
+        viewSoundWave model
+
+    else
+        button
+            [ class "button replay-button"
+            , onClick (PlaySound model.currentKey)
+            ]
+            [ text "Replay Sound" ]
+
+
 viewSoundWave : Model -> Html.Html Msg
 viewSoundWave model =
     let
-        ( minX, minY ) =
-            ( 0, 10 )
+        ( verticalSpreadFactor, horizontalSpreadFactor ) =
+            ( 20, 5 )
 
-        ( maxX, maxY ) =
-            ( 100, 80 )
+        xs =
+            List.range 1 100 |> List.map toFloat
 
+        sinYs =
+            List.map (\x -> 50 + (sin (x / horizontalSpreadFactor) * verticalSpreadFactor)) xs
+
+        cosYs =
+            List.map (\x -> 50 + (cos (x / horizontalSpreadFactor) * verticalSpreadFactor)) xs
+
+        sinCoords =
+            List.map2 Tuple.pair xs sinYs
+
+        cosCoords =
+            List.map2 Tuple.pair xs cosYs
+
+        sinPath =
+            List.foldl
+                (\( x, y ) pathAcc -> pathAcc ++ " L" ++ String.fromFloat x ++ "," ++ String.fromFloat y)
+                ""
+                sinCoords
+                |> String.dropLeft 2
+                |> (\p -> "M" ++ p)
+
+        cosPath =
+            List.foldl
+                (\( x, y ) pathAcc -> pathAcc ++ " L" ++ String.fromFloat x ++ "," ++ String.fromFloat y)
+                ""
+                cosCoords
+                |> String.dropLeft 2
+                |> (\p -> "M" ++ p)
+
+        {--
         fromPath =
-            "M0,50 L10,45 L20,55 L30,35 L40,55 L50,50"
+            "M0,50 L20,45 L40,55 L60,35 L80,55 L100,50"
 
         toPath =
-            "M0,50 L10,50 L20,45 L30,55 L40,45 L50,50"
+            "M0,50 L20,50 L40,45 L60,55 L80,45 L100,50"
 
         toPath2 =
-            "M0,50 L10,40 L20,35 L30,45 L40,65 L50,50"
+            "M0,50 L20,40 L40,35 L60,45 L80,65 L100,50"
+            --}
     in
     Svg.svg
-        []
+        [ SvgAttr.viewBox "0 0 100 100" ]
         [ Svg.path
-            [ d fromPath
+            [ d sinPath
             ]
-            [ Svg.animate
+            [{--Svg.animate
                 [ SvgAttr.id "anim1"
-                , from fromPath
-                , to toPath
+                , from sinPath
+                , to cosPath
                 , attributeName "d"
-                , SvgAttr.dur "0.2s"
-                , SvgAttr.begin "0s; anim3.end"
+                , SvgAttr.dur "0.1s"
+                , SvgAttr.begin "0s; anim2.end"
                 , SvgAttr.fill "freeze"
                 ]
                 []
             , Svg.animate
                 [ SvgAttr.id "anim2"
-                , from toPath
-                , to toPath2
+                , from cosPath
+                , to sinPath
                 , attributeName "d"
-                , SvgAttr.dur "0.2s"
+                , SvgAttr.dur "0.1s"
                 , SvgAttr.begin "anim1.end"
                 , SvgAttr.fill "freeze"
                 ]
                 []
+
             , Svg.animate
                 [ SvgAttr.id "anim3"
                 , from toPath2
                 , to fromPath
                 , attributeName "d"
-                , SvgAttr.dur "0.2s"
+                , SvgAttr.dur "0.1s"
                 , SvgAttr.begin "anim2.end"
                 , SvgAttr.fill "freeze"
                 ]
                 []
+                --}
             ]
         ]
 
