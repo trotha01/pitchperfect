@@ -10102,6 +10102,7 @@ var author$project$Main$PlaySound = function (a) {
 	return {$: 'PlaySound', a: a};
 };
 var elm$core$Basics$cos = _Basics_cos;
+var elm$core$Basics$pi = _Basics_pi;
 var elm$core$Basics$sin = _Basics_sin;
 var elm$core$String$fromFloat = _String_fromNumber;
 var elm$core$Tuple$pair = F2(
@@ -10109,18 +10110,82 @@ var elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var elm$svg$Svg$animate = elm$svg$Svg$trustedNode('animate');
+var elm$svg$Svg$animateTransform = elm$svg$Svg$trustedNode('animateTransform');
+var elm$svg$Svg$defs = elm$svg$Svg$trustedNode('defs');
+var elm$svg$Svg$line = elm$svg$Svg$trustedNode('line');
 var elm$svg$Svg$path = elm$svg$Svg$trustedNode('path');
+var elm$svg$Svg$pattern = elm$svg$Svg$trustedNode('pattern');
+var elm$svg$Svg$rect = elm$svg$Svg$trustedNode('rect');
 var elm$svg$Svg$svg = elm$svg$Svg$trustedNode('svg');
+var elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
+var elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
 var elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var elm$svg$Svg$Attributes$dur = _VirtualDom_attribute('dur');
+var elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var elm$svg$Svg$Attributes$from = function (value) {
+	return A2(
+		_VirtualDom_attribute,
+		'from',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
+var elm$svg$Svg$Attributes$patternTransform = _VirtualDom_attribute('patternTransform');
+var elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
+var elm$svg$Svg$Attributes$repeatCount = _VirtualDom_attribute('repeatCount');
+var elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var elm$svg$Svg$Attributes$style = _VirtualDom_attribute('style');
+var elm$svg$Svg$Attributes$to = function (value) {
+	return A2(
+		_VirtualDom_attribute,
+		'to',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var elm$svg$Svg$Attributes$type_ = _VirtualDom_attribute('type');
 var elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
+var elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
+var elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
+var elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
 var author$project$Main$viewSoundWave = function (model) {
-	var xs = A2(
-		elm$core$List$map,
-		elm$core$Basics$toFloat,
-		A2(elm$core$List$range, 1, 100));
+	var curve = A2(
+		elm$svg$Svg$path,
+		_List_fromArray(
+			[
+				elm$svg$Svg$Attributes$d('M10 80 Q 52.5 10, 95 80 T 180 80')
+			]),
+		_List_Nil);
 	var _n0 = _Utils_Tuple2(20, 5);
 	var verticalSpreadFactor = _n0.a;
 	var horizontalSpreadFactor = _n0.b;
+	var _n1 = _Utils_Tuple2(20, 5);
+	var wavelength = _n1.a;
+	var amplitude = _n1.b;
+	var animation = A2(
+		elm$svg$Svg$animateTransform,
+		_List_fromArray(
+			[
+				elm$svg$Svg$Attributes$id('anim1'),
+				elm$svg$Svg$Attributes$from(
+				elm$core$String$fromInt(wavelength) + ',0'),
+				elm$svg$Svg$Attributes$to('0,0'),
+				elm$svg$Svg$Attributes$attributeName('patternTransform'),
+				elm$svg$Svg$Attributes$type_('translate'),
+				elm$svg$Svg$Attributes$dur('0.5s'),
+				elm$svg$Svg$Attributes$begin('0s'),
+				elm$svg$Svg$Attributes$fill('freeze'),
+				elm$svg$Svg$Attributes$repeatCount('indefinite')
+			]),
+		_List_Nil);
+	var maxX = wavelength;
+	var xs = A2(
+		elm$core$List$map,
+		elm$core$Basics$toFloat,
+		A2(elm$core$List$range, 0, wavelength));
 	var cosYs = A2(
 		elm$core$List$map,
 		function (x) {
@@ -10137,9 +10202,9 @@ var author$project$Main$viewSoundWave = function (model) {
 			A3(
 				elm$core$List$foldl,
 				F2(
-					function (_n2, pathAcc) {
-						var x = _n2.a;
-						var y = _n2.b;
+					function (_n3, pathAcc) {
+						var x = _n3.a;
+						var y = _n3.b;
 						return pathAcc + (' L' + (elm$core$String$fromFloat(x) + (',' + elm$core$String$fromFloat(y))));
 					}),
 				'',
@@ -10147,7 +10212,7 @@ var author$project$Main$viewSoundWave = function (model) {
 	var sinYs = A2(
 		elm$core$List$map,
 		function (x) {
-			return 50 + (elm$core$Basics$sin(x / horizontalSpreadFactor) * verticalSpreadFactor);
+			return 50 + (amplitude * elm$core$Basics$sin(((2 * elm$core$Basics$pi) * x) / wavelength));
 		},
 		xs);
 	var sinCoords = A3(elm$core$List$map2, elm$core$Tuple$pair, xs, sinYs);
@@ -10160,13 +10225,100 @@ var author$project$Main$viewSoundWave = function (model) {
 			A3(
 				elm$core$List$foldl,
 				F2(
-					function (_n1, pathAcc) {
-						var x = _n1.a;
-						var y = _n1.b;
+					function (_n2, pathAcc) {
+						var x = _n2.a;
+						var y = _n2.b;
 						return pathAcc + (' L' + (elm$core$String$fromFloat(x) + (',' + elm$core$String$fromFloat(y))));
 					}),
 				'',
 				sinCoords)));
+	var sinSVG = A2(
+		elm$svg$Svg$path,
+		_List_fromArray(
+			[
+				elm$svg$Svg$Attributes$d(sinPath)
+			]),
+		_List_Nil);
+	var pattern = A2(
+		elm$svg$Svg$defs,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$svg$Svg$pattern,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$id('sinWave'),
+						elm$svg$Svg$Attributes$x('0'),
+						elm$svg$Svg$Attributes$y('0'),
+						elm$svg$Svg$Attributes$height('100'),
+						elm$svg$Svg$Attributes$width('20'),
+						elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
+						elm$svg$Svg$Attributes$patternTransform('translate(-50,0)')
+					]),
+				_List_fromArray(
+					[sinSVG, animation])),
+				A2(
+				elm$svg$Svg$pattern,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$id('pattern'),
+						elm$svg$Svg$Attributes$x('0'),
+						elm$svg$Svg$Attributes$y('0'),
+						elm$svg$Svg$Attributes$height('0.25'),
+						elm$svg$Svg$Attributes$width('0.25')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$svg$Svg$rect,
+						_List_fromArray(
+							[
+								elm$svg$Svg$Attributes$x('0'),
+								elm$svg$Svg$Attributes$y('0'),
+								elm$svg$Svg$Attributes$height('25'),
+								elm$svg$Svg$Attributes$width('25'),
+								elm$svg$Svg$Attributes$fill('skyBlue')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				elm$svg$Svg$pattern,
+				_List_fromArray(
+					[
+						elm$svg$Svg$Attributes$id('diagonalHatch'),
+						elm$svg$Svg$Attributes$width('10'),
+						elm$svg$Svg$Attributes$height('10'),
+						elm$svg$Svg$Attributes$patternTransform('rotate(45 0 0)'),
+						elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$svg$Svg$line,
+						_List_fromArray(
+							[
+								elm$svg$Svg$Attributes$x1('0'),
+								elm$svg$Svg$Attributes$y1('0'),
+								elm$svg$Svg$Attributes$x2('0'),
+								elm$svg$Svg$Attributes$y2('10'),
+								elm$svg$Svg$Attributes$style('stroke:black; stroke-width:1')
+							]),
+						_List_Nil)
+					])),
+				A2(
+				elm$svg$Svg$pattern,
+				_List_fromArray(
+					[
+						elm$svg$Svg$Attributes$id('curve'),
+						elm$svg$Svg$Attributes$width('100'),
+						elm$svg$Svg$Attributes$height('200'),
+						elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
+						elm$svg$Svg$Attributes$patternTransform('translate(-50,0)')
+					]),
+				_List_fromArray(
+					[curve]))
+			]));
 	return A2(
 		elm$svg$Svg$svg,
 		_List_fromArray(
@@ -10175,11 +10327,28 @@ var author$project$Main$viewSoundWave = function (model) {
 			]),
 		_List_fromArray(
 			[
+				pattern,
 				A2(
-				elm$svg$Svg$path,
+				elm$svg$Svg$rect,
 				_List_fromArray(
 					[
-						elm$svg$Svg$Attributes$d(sinPath)
+						elm$svg$Svg$Attributes$fill('url(#sinWave)'),
+						elm$svg$Svg$Attributes$stroke('black'),
+						elm$svg$Svg$Attributes$width('100'),
+						elm$svg$Svg$Attributes$height('100')
+					]),
+				_List_Nil),
+				A2(
+				elm$svg$Svg$animate,
+				_List_fromArray(
+					[
+						elm$svg$Svg$Attributes$id('anim1'),
+						elm$svg$Svg$Attributes$from('translate(0,0)'),
+						elm$svg$Svg$Attributes$to('translate(-50,0)'),
+						elm$svg$Svg$Attributes$attributeName('patternTransform'),
+						elm$svg$Svg$Attributes$dur('0.1s'),
+						elm$svg$Svg$Attributes$begin('0s'),
+						elm$svg$Svg$Attributes$fill('freeze')
 					]),
 				_List_Nil)
 			]));

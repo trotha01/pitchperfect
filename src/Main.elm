@@ -368,11 +368,17 @@ viewSoundWave model =
         ( verticalSpreadFactor, horizontalSpreadFactor ) =
             ( 20, 5 )
 
+        ( wavelength, amplitude ) =
+            ( 20, 5 )
+
+        maxX =
+            wavelength
+
         xs =
-            List.range 1 100 |> List.map toFloat
+            List.range 0 wavelength |> List.map toFloat
 
         sinYs =
-            List.map (\x -> 50 + (sin (x / horizontalSpreadFactor) * verticalSpreadFactor)) xs
+            List.map (\x -> 50 + amplitude * sin (2 * pi * x / wavelength)) xs
 
         cosYs =
             List.map (\x -> 50 + (cos (x / horizontalSpreadFactor) * verticalSpreadFactor)) xs
@@ -399,23 +405,113 @@ viewSoundWave model =
                 |> String.dropLeft 2
                 |> (\p -> "M" ++ p)
 
-        {--
-        fromPath =
-            "M0,50 L20,45 L40,55 L60,35 L80,55 L100,50"
+        sinSVG =
+            Svg.path
+                [ d sinPath
+                ]
+                []
 
-        toPath =
-            "M0,50 L20,50 L40,45 L60,55 L80,45 L100,50"
+        curve =
+            Svg.path
+                [ d "M10 80 Q 52.5 10, 95 80 T 180 80"
+                ]
+                []
 
-        toPath2 =
-            "M0,50 L20,40 L40,35 L60,45 L80,65 L100,50"
-            --}
+        animation =
+            Svg.animateTransform
+                [ SvgAttr.id "anim1"
+                , from (String.fromInt wavelength ++ ",0")
+                , to "0,0"
+                , SvgAttr.attributeName "patternTransform"
+                , SvgAttr.type_ "translate"
+                , SvgAttr.dur "0.5s"
+                , SvgAttr.begin "0s"
+                , SvgAttr.fill "freeze"
+                , SvgAttr.repeatCount "indefinite"
+                ]
+                []
+
+        pattern =
+            Svg.defs []
+                [ Svg.pattern
+                    [ id "sinWave"
+                    , SvgAttr.x "0"
+                    , SvgAttr.y "0"
+                    , SvgAttr.height "100"
+                    , SvgAttr.width "20"
+                    , SvgAttr.patternUnits "userSpaceOnUse"
+                    , SvgAttr.patternTransform "translate(-50,0)"
+                    ]
+                    [ sinSVG
+                    , animation
+                    ]
+                , Svg.pattern
+                    [ id "pattern"
+                    , SvgAttr.x "0"
+                    , SvgAttr.y "0"
+                    , SvgAttr.height "0.25"
+                    , SvgAttr.width "0.25"
+                    ]
+                    [ Svg.rect
+                        [ SvgAttr.x "0"
+                        , SvgAttr.y "0"
+                        , SvgAttr.height "25"
+                        , SvgAttr.width "25"
+                        , SvgAttr.fill "skyBlue"
+                        ]
+                        []
+                    ]
+                , Svg.pattern
+                    [ SvgAttr.id "diagonalHatch"
+                    , SvgAttr.width "10"
+                    , SvgAttr.height "10"
+                    , SvgAttr.patternTransform "rotate(45 0 0)"
+                    , SvgAttr.patternUnits "userSpaceOnUse"
+                    ]
+                    [ Svg.line
+                        [ SvgAttr.x1 "0"
+                        , SvgAttr.y1 "0"
+                        , SvgAttr.x2 "0"
+                        , SvgAttr.y2 "10"
+                        , SvgAttr.style "stroke:black; stroke-width:1"
+                        ]
+                        []
+                    ]
+                , Svg.pattern
+                    [ SvgAttr.id "curve"
+                    , SvgAttr.width "100"
+                    , SvgAttr.height "200"
+                    , SvgAttr.patternUnits "userSpaceOnUse"
+                    , SvgAttr.patternTransform "translate(-50,0)"
+                    ]
+                    [ curve ]
+                ]
     in
     Svg.svg
         [ SvgAttr.viewBox "0 0 100 100" ]
-        [ Svg.path
-            [ d sinPath
+        [ pattern
+        , Svg.rect
+            [ SvgAttr.fill "url(#sinWave)"
+            , SvgAttr.stroke "black"
+            , SvgAttr.width "100"
+            , SvgAttr.height "100"
             ]
-            [{--Svg.animate
+            []
+        , Svg.animate
+            [ SvgAttr.id "anim1"
+            , from "translate(0,0)"
+            , to "translate(-50,0)"
+            , attributeName "patternTransform"
+            , SvgAttr.dur "0.1s"
+            , SvgAttr.begin "0s"
+            , SvgAttr.fill "freeze"
+            ]
+            []
+        ]
+
+
+
+{--[Svg.animate
                 [ SvgAttr.id "anim1"
                 , from sinPath
                 , to cosPath
@@ -447,8 +543,6 @@ viewSoundWave model =
                 ]
                 []
                 --}
-            ]
-        ]
 
 
 viewChoices : Model -> Html.Html Msg
