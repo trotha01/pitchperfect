@@ -10098,153 +10098,21 @@ var author$project$Main$viewChoices = function (model) {
 			A3(author$project$Main$viewChoice, widthPerChoice, model.answer, model.currentKey),
 			model.keysTesting));
 };
+var author$project$Main$radarData = _List_fromArray(
+	[
+		{name: 'C', value: 1},
+		{name: 'D', value: 3},
+		{name: 'E', value: 1},
+		{name: 'F', value: 2},
+		{name: 'G', value: 2},
+		{name: 'A', value: 2},
+		{name: 'B', value: 2}
+	]);
 var author$project$Main$PlaySound = function (a) {
 	return {$: 'PlaySound', a: a};
 };
-var elm$core$Basics$pi = _Basics_pi;
-var elm$core$Basics$sin = _Basics_sin;
-var elm$core$String$fromFloat = _String_fromNumber;
-var elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
-var elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var elm$svg$Svg$animateTransform = elm$svg$Svg$trustedNode('animateTransform');
-var elm$svg$Svg$defs = elm$svg$Svg$trustedNode('defs');
-var elm$svg$Svg$path = elm$svg$Svg$trustedNode('path');
-var elm$svg$Svg$pattern = elm$svg$Svg$trustedNode('pattern');
-var elm$svg$Svg$rect = elm$svg$Svg$trustedNode('rect');
-var elm$svg$Svg$svg = elm$svg$Svg$trustedNode('svg');
-var elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
-var elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
-var elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
-var elm$svg$Svg$Attributes$dur = _VirtualDom_attribute('dur');
-var elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var elm$svg$Svg$Attributes$from = function (value) {
-	return A2(
-		_VirtualDom_attribute,
-		'from',
-		_VirtualDom_noJavaScriptUri(value));
-};
-var elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
-var elm$svg$Svg$Attributes$patternTransform = _VirtualDom_attribute('patternTransform');
-var elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
-var elm$svg$Svg$Attributes$repeatCount = _VirtualDom_attribute('repeatCount');
-var elm$svg$Svg$Attributes$to = function (value) {
-	return A2(
-		_VirtualDom_attribute,
-		'to',
-		_VirtualDom_noJavaScriptUri(value));
-};
-var elm$svg$Svg$Attributes$type_ = _VirtualDom_attribute('type');
-var elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var author$project$Main$viewSoundWave = function (model) {
-	var _n0 = _Utils_Tuple2(20, 5);
-	var wavelength = _n0.a;
-	var amplitude = _n0.b;
-	var _n1 = _Utils_Tuple2(wavelength * 4, amplitude * 4);
-	var svgWidth = _n1.a;
-	var svgHeight = _n1.b;
-	var viewBox = '0 0 ' + (elm$core$String$fromInt(svgWidth) + (' ' + elm$core$String$fromInt(svgHeight)));
-	var animation = A2(
-		elm$svg$Svg$animateTransform,
-		_List_fromArray(
-			[
-				elm$svg$Svg$Attributes$id('anim1'),
-				elm$svg$Svg$Attributes$from(
-				elm$core$String$fromInt(wavelength) + ',0'),
-				elm$svg$Svg$Attributes$to('0,0'),
-				elm$svg$Svg$Attributes$attributeName('patternTransform'),
-				elm$svg$Svg$Attributes$type_('translate'),
-				elm$svg$Svg$Attributes$dur('0.5s'),
-				elm$svg$Svg$Attributes$begin('0s'),
-				elm$svg$Svg$Attributes$fill('freeze'),
-				elm$svg$Svg$Attributes$repeatCount('indefinite')
-			]),
-		_List_Nil);
-	var xs = A2(
-		elm$core$List$map,
-		elm$core$Basics$toFloat,
-		A2(elm$core$List$range, 0, wavelength));
-	var sinYs = A2(
-		elm$core$List$map,
-		function (x) {
-			return (amplitude * 2) + (amplitude * elm$core$Basics$sin(((2 * elm$core$Basics$pi) * x) / wavelength));
-		},
-		xs);
-	var sinCoords = A3(elm$core$List$map2, elm$core$Tuple$pair, xs, sinYs);
-	var sinPath = function (p) {
-		return 'M' + p;
-	}(
-		A2(
-			elm$core$String$dropLeft,
-			2,
-			A3(
-				elm$core$List$foldl,
-				F2(
-					function (_n2, pathAcc) {
-						var x = _n2.a;
-						var y = _n2.b;
-						return pathAcc + (' L' + (elm$core$String$fromFloat(x) + (',' + elm$core$String$fromFloat(y))));
-					}),
-				'',
-				sinCoords)));
-	var sinSVG = A2(
-		elm$svg$Svg$path,
-		_List_fromArray(
-			[
-				elm$svg$Svg$Attributes$d(sinPath)
-			]),
-		_List_Nil);
-	var pattern = A2(
-		elm$svg$Svg$defs,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				elm$svg$Svg$pattern,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$id('sinWave'),
-						elm$svg$Svg$Attributes$x('0'),
-						elm$svg$Svg$Attributes$y('0'),
-						elm$svg$Svg$Attributes$height(
-						elm$core$String$fromInt(svgHeight)),
-						elm$svg$Svg$Attributes$width('20'),
-						elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
-						elm$svg$Svg$Attributes$patternTransform('translate(-50,0)')
-					]),
-				_List_fromArray(
-					[sinSVG, animation]))
-			]));
-	return A2(
-		elm$svg$Svg$svg,
-		_List_fromArray(
-			[
-				elm$svg$Svg$Attributes$viewBox(viewBox)
-			]),
-		_List_fromArray(
-			[
-				pattern,
-				A2(
-				elm$svg$Svg$rect,
-				_List_fromArray(
-					[
-						elm$svg$Svg$Attributes$fill('url(#sinWave)'),
-						elm$svg$Svg$Attributes$width(
-						elm$core$String$fromInt(svgWidth)),
-						elm$svg$Svg$Attributes$height(
-						elm$core$String$fromInt(svgHeight))
-					]),
-				_List_Nil)
-			]));
-};
 var author$project$Main$viewReplayButton = function (model) {
-	return model.playingSound ? author$project$Main$viewSoundWave(model) : A2(
+	return A2(
 		elm$html$Html$button,
 		_List_fromArray(
 			[
@@ -10256,6 +10124,70 @@ var author$project$Main$viewReplayButton = function (model) {
 			[
 				elm$html$Html$text('Replay Sound')
 			]));
+};
+var author$project$Radar$numberOfScales = 7;
+var author$project$Radar$chartSize = 100;
+var elm$core$String$fromFloat = _String_fromNumber;
+var elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var elm$svg$Svg$circle = elm$svg$Svg$trustedNode('circle');
+var elm$svg$Svg$g = elm$svg$Svg$trustedNode('g');
+var elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var author$project$Radar$radarScale = function (scale) {
+	return A2(
+		elm$svg$Svg$g,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				elm$svg$Svg$circle,
+				_List_fromArray(
+					[
+						elm$svg$Svg$Attributes$cx('50'),
+						elm$svg$Svg$Attributes$cy('50'),
+						elm$svg$Svg$Attributes$r(
+						elm$core$String$fromFloat(((scale / author$project$Radar$numberOfScales) * author$project$Radar$chartSize) / 2)),
+						elm$svg$Svg$Attributes$fill('#FAFAFA'),
+						elm$svg$Svg$Attributes$stroke('#999'),
+						elm$svg$Svg$Attributes$strokeWidth('0.2')
+					]),
+				_List_Nil)
+			]));
+};
+var elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var elm$core$Basics$round = _Basics_round;
+var author$project$Radar$spokes = A2(
+	elm$svg$Svg$g,
+	_List_Nil,
+	A2(
+		elm$core$List$map,
+		A2(elm$core$Basics$composeR, elm$core$Basics$toFloat, author$project$Radar$radarScale),
+		elm$core$List$reverse(
+			A2(
+				elm$core$List$range,
+				1,
+				elm$core$Basics$round(author$project$Radar$numberOfScales)))));
+var elm$svg$Svg$svg = elm$svg$Svg$trustedNode('svg');
+var elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var author$project$Radar$radar = function (points) {
+	return A2(
+		elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				elm$svg$Svg$Attributes$viewBox('0 0 100 100'),
+				elm$svg$Svg$Attributes$class('radar')
+			]),
+		_List_fromArray(
+			[author$project$Radar$spokes]));
 };
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$h3 = _VirtualDom_node('h3');
@@ -10313,6 +10245,16 @@ var author$project$Main$viewHeader = function (model) {
 					]),
 				_List_fromArray(
 					[
+						A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('radar-container')
+							]),
+						_List_fromArray(
+							[
+								author$project$Radar$radar(author$project$Main$radarData)
+							])),
 						A2(
 						elm$html$Html$h3,
 						_List_fromArray(
@@ -10383,8 +10325,7 @@ var author$project$Main$viewHomescreen = function (model) {
 								elm$html$Html$Attributes$class('fas fa-play')
 							]),
 						_List_Nil)
-					])),
-				author$project$Main$viewSoundWave(model)
+					]))
 			]));
 };
 var author$project$Main$view = function (model) {

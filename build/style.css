@@ -119,3 +119,8 @@ svg path {
   stroke-linecap: round;
   fill: none;
 }
+
+.radar-container .radar {
+  width: 50px;
+  height: auto;
+}

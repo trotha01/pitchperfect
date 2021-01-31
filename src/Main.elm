@@ -6,7 +6,9 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Images
 import Process
+import Radar exposing (..)
 import Random
 import Svg
 import Svg.Attributes as SvgAttr exposing (attributeName, d, from, to, x, y)
@@ -317,7 +319,9 @@ viewHomescreen model =
             ]
         , button [ class "start-button button", onClick StartGame ]
             [ i [ class "fas fa-play" ] [] ]
-        , viewSoundWave model
+
+        -- , Images.view Images.soundWave
+        -- , Images.view Images.c
         ]
 
 
@@ -345,95 +349,37 @@ viewHeader model =
         , div [ class "controls row grow" ]
             [ viewReplayButton model ]
         , div [ class "status row grow" ]
-            [ h3 [ class "points" ] [ text (String.fromInt model.points) ] ]
+            [ div [ class "radar-container" ] [ radar radarData ]
+            , h3 [ class "points" ] [ text (String.fromInt model.points) ]
+            ]
         ]
+
+
+radarData : Radar.Points
+radarData =
+    [ { name = "C", value = 1 }
+    , { name = "D", value = 3 }
+    , { name = "E", value = 1 }
+    , { name = "F", value = 2 }
+    , { name = "G", value = 2 }
+    , { name = "A", value = 2 }
+    , { name = "B", value = 2 }
+    ]
 
 
 viewReplayButton : Model -> Html.Html Msg
 viewReplayButton model =
+    {--
     if model.playingSound then
-        viewSoundWave model
+        Images.view Images.soundWave
 
     else
-        button
-            [ class "button replay-button"
-            , onClick (PlaySound model.currentKey)
-            ]
-            [ text "Replay Sound" ]
-
-
-viewSoundWave : Model -> Html.Html Msg
-viewSoundWave model =
-    let
-        ( wavelength, amplitude ) =
-            ( 20, 5 )
-
-        ( svgWidth, svgHeight ) =
-            ( wavelength * 4, amplitude * 4 )
-
-        xs =
-            List.range 0 wavelength |> List.map toFloat
-
-        sinYs =
-            List.map (\x -> (amplitude * 2) + amplitude * sin (2 * pi * x / wavelength)) xs
-
-        sinCoords =
-            List.map2 Tuple.pair xs sinYs
-
-        sinPath =
-            List.foldl
-                (\( x, y ) pathAcc -> pathAcc ++ " L" ++ String.fromFloat x ++ "," ++ String.fromFloat y)
-                ""
-                sinCoords
-                |> String.dropLeft 2
-                |> (\p -> "M" ++ p)
-
-        sinSVG =
-            Svg.path [ d sinPath ] []
-
-        animation =
-            Svg.animateTransform
-                [ SvgAttr.id "anim1"
-                , from (String.fromInt wavelength ++ ",0")
-                , to "0,0"
-                , SvgAttr.attributeName "patternTransform"
-                , SvgAttr.type_ "translate"
-                , SvgAttr.dur "0.5s"
-                , SvgAttr.begin "0s"
-                , SvgAttr.fill "freeze"
-                , SvgAttr.repeatCount "indefinite"
-                ]
-                []
-
-        pattern =
-            Svg.defs []
-                [ Svg.pattern
-                    [ id "sinWave"
-                    , SvgAttr.x "0"
-                    , SvgAttr.y "0"
-                    , SvgAttr.height (String.fromInt svgHeight)
-                    , SvgAttr.width "20"
-                    , SvgAttr.patternUnits "userSpaceOnUse"
-                    , SvgAttr.patternTransform "translate(-50,0)"
-                    ]
-                    [ sinSVG
-                    , animation
-                    ]
-                ]
-
-        viewBox =
-            "0 0 " ++ String.fromInt svgWidth ++ " " ++ String.fromInt svgHeight
-    in
-    Svg.svg
-        [ SvgAttr.viewBox viewBox ]
-        [ pattern
-        , Svg.rect
-            [ SvgAttr.fill "url(#sinWave)"
-            , SvgAttr.width (String.fromInt svgWidth)
-            , SvgAttr.height (String.fromInt svgHeight)
-            ]
-            []
+      --}
+    button
+        [ class "button replay-button"
+        , onClick (PlaySound model.currentKey)
         ]
+        [ text "Replay Sound" ]
 
 
 viewChoices : Model -> Html.Html Msg
